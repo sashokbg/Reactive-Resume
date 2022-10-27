@@ -181,7 +181,7 @@ export const getSectionsByType = (
   if (isEmpty(sections)) return [];
 
   return Object.entries(sections).reduce((acc, [id, section]) => {
-    if (section.type.startsWith(type)) {
+    if (section.type.startsWith(type) && section.isDuplicated) {
       return [...acc, { ...section, id }];
     }
 
