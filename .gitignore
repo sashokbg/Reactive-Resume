@@ -1,6 +1,7 @@
 # Environment Variables
 .env
 .env.*
+!.env.example
 
 # Project Dependencies
 node_modules
@@ -11,5 +12,5 @@ node_modules
 # Turbo
 .turbo
 
-# Jetbrains
+# Intellij
 .idea

@@ -23,7 +23,7 @@ import {
   VolunteerActivism,
   Work,
 } from '@mui/icons-material';
-import { Section as SectionRecord } from '@reactive-resume/schema';
+import { Section as SectionRecord, SectionType } from '@reactive-resume/schema';
 import isEmpty from 'lodash/isEmpty';
 
 import Basics from '@/components/build/LeftSidebar/sections/Basics';
@@ -60,7 +60,17 @@ export const left: SidebarSection[] = [
   {
     id: 'work',
     icon: <Work />,
-    component: <Section path="sections.work" titleKey="name" subtitleKey="position" isEditable isHideable />,
+    component: (
+      <Section
+        type={'work'}
+        addMore={true}
+        path="sections.work"
+        titleKey="name"
+        subtitleKey="position"
+        isEditable
+        isHideable
+      />
+    ),
   },
   {
     id: 'education',
@@ -163,6 +173,21 @@ export const right: SidebarSection[] = [
     component: <Links />,
   },
 ];
+
+export const getSectionsByType = (
+  sections: Record<string, SectionRecord>,
+  type: SectionType
+): Array<Required<SectionRecord>> => {
+  if (isEmpty(sections)) return [];
+
+  return Object.entries(sections).reduce((acc, [id, section]) => {
+    if (section.type.startsWith(type)) {
+      return [...acc, { ...section, id }];
+    }
+
+    return acc;
+  }, [] as Array<Required<SectionRecord>>);
+};
 
 export const getCustomSections = (sections: Record<string, SectionRecord>): Array<Required<SectionRecord>> => {
   if (isEmpty(sections)) return [];
