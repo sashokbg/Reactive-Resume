@@ -7,6 +7,7 @@ import Kakuna from './Kakuna/Kakuna';
 import Leafish from './Leafish/Leafish';
 import Onyx from './Onyx/Onyx';
 import Pikachu from './Pikachu/Pikachu';
+import Proxym from './Proxym/Proxym';
 
 export type TemplateMeta = {
   id: string;
@@ -16,6 +17,12 @@ export type TemplateMeta = {
 };
 
 const templateMap: Record<string, TemplateMeta> = {
+  proxym: {
+    id: 'proxym',
+    name: 'Proxym',
+    preview: '/images/templates/gengar.jpg',
+    component: Proxym
+  },
   kakuna: {
     id: 'kakuna',
     name: 'Kakuna',
