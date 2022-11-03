@@ -8,14 +8,14 @@ import { useAppSelector } from '@/store/hooks';
 import { getContrastColor } from '@/utils/styles';
 import { PageProps } from '@/utils/template';
 
+import proxymLogoName from '../../public/images/proxym/proxym-logo-name.svg';
+import proxymLogoNameBackground from '../../public/images/proxym/proxym-logo-name-background.svg';
+import proxymLogoNoName from '../../public/images/proxym/proxym-logo-no-name.svg';
 import { getSectionById } from '../sectionMap';
 import styles from './Proxym.module.scss';
 import { MastheadMain, MastheadSidebar } from './widgets/Masthead';
 import Section from './widgets/Section';
-
-import proxymLogoNameBackground from '../../public/images/proxym/proxym-logo-name-background.svg';
-import proxymLogoName from '../../public/images/proxym/proxym-logo-name.svg';
-import proxymLogoNoName from '../../public/images/proxym/proxym-logo-no-name.svg';
+import Timeline from "@/templates/Proxym/widgets/Timeline";
 
 
 const Proxym: React.FC<PageProps> = ({ page }) => {
@@ -33,6 +33,7 @@ const Proxym: React.FC<PageProps> = ({ page }) => {
       <img src={proxymLogoName.src} alt="image" style={{position: 'absolute', top: '35px', right: '40px'}}/>
       <div className={styles.container}>
         {isFirstPage && <div className={styles.sidebar} >
+          <Timeline key="timeline" />
           <div
             className={clsx(css(`svg { color: ${color} } --primary-color: ${color}`))}
           >
