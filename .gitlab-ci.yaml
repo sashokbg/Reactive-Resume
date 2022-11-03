@@ -1,0 +1,128 @@
+image: node:lts-alpine
+
+stages:
+  - build
+  - build_image
+  - deploy
+
+build_client:
+  stage: build
+  tags:
+    - docker
+  artifacts:
+    paths:
+      - ./
+    expire_in: 4 hours
+  only:
+    - master
+  before_script:
+    - apk add --no-cache g++ git curl make python3
+    - curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm
+    - pnpm install --frozen-lockfile
+  script:
+    - pnpm run build --filter client
+
+build_server:
+  stage: build
+  tags:
+    - docker
+  artifacts:
+    paths:
+      - ./
+    expire_in: 4 hours
+  only:
+    - master
+  before_script:
+    - apk add --no-cache g++ git curl make python3
+    - curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm
+    - pnpm install --frozen-lockfile
+  script:
+    - pnpm run build --filter server
+
+build_image_client:dev:
+  stage: build_image
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  tags:
+    - docker
+  variables:
+    GIT_STRATEGY: none
+    TAG: dev
+  artifacts:
+    paths:
+      - ./values-dev.yml
+    expire_in: 4 hours
+  only:
+    - master
+  script:
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --single-snapshot --dockerfile $CI_PROJECT_DIR/client/Dockerfile --destination $CI_REGISTRY_IMAGE/client:$TAG
+
+
+
+build_image_server:dev:
+  stage: build_image
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  tags:
+    - docker
+  variables:
+    GIT_STRATEGY: none
+    TAG: dev
+  artifacts:
+    paths:
+      - ./values-dev.yml
+    expire_in: 4 hours
+  only:
+    - master
+  script:
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --single-snapshot --dockerfile $CI_PROJECT_DIR/server/Dockerfile --destination $CI_REGISTRY_IMAGE/server:$TAG
+
+
+deploy_client:dev:
+  stage: deploy
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  tags:
+    - docker
+  variables:
+    GIT_STRATEGY: none
+    TAG: dev
+  artifacts:
+    paths:
+      - ./values-dev.yml
+    expire_in: 4 hours
+  only:
+    - master
+  script:
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --single-snapshot --dockerfile $CI_PROJECT_DIR/client/Dockerfile --destination $CI_REGISTRY_IMAGE/client:$TAG
+
+deploy_server:dev:
+  stage: deploy
+  image: gitlab-registry.proxym-group.net/docker/helm:3
+  tags:
+    - docker
+  variables:
+    GIT_STRATEGY: none
+    ENV: dev
+  needs:
+    - job: build_image_server:dev
+      artifacts: true
+  only:
+    - master
+  before_script:
+    - kubectl config set-cluster k8s --server="${K8S_SERVER}"
+    - kubectl config set clusters.k8s.certificate-authority-data ${K8S_CA_DATA}
+    - kubectl config set-credentials gitlab --token="${K8S_USER_TOKEN}"
+    - kubectl config set-context default --cluster=k8s --user=gitlab --namespace=${K8S_NAMESPACE}
+    - kubectl config use-context default
+  script:
+    - helm repo add ${HELM_REPO} ${HELM_REPO_URL} --username ${HELM_USERNAME} --password ${HELM_PASSWORD}
+    - helm upgrade --install  ${PROJECT}-${ENV} --version ${VERSION} -f ./values-dev.yml proxym/node
+
+
