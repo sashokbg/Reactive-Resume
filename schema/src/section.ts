@@ -137,6 +137,8 @@ export type SectionType =
   | 'languages'
   | 'interests'
   | 'volunteer'
+  | 'projects'
+  | 'references'
   | 'custom'
   | 'work';
 
