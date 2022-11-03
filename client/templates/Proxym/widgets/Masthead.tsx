@@ -25,7 +25,7 @@ export const MastheadSidebar: React.FC = () => {
   const iconColor = useMemo(() => (contrast === 'dark' ? theme.text : theme.background), [theme, contrast]);
 
   return (
-    <div className="col-span-2 grid justify-items-start gap-3 p-4" style={{display: 'flex', justifyContent: 'center'}}>
+    <div className="col-span-2 grid justify-items-start gap-3 p-4" style={{justifyContent: 'center'}}>
       {photo.visible && !isEmpty(photo.url) && (
         <img
           alt={name}
@@ -41,7 +41,7 @@ export const MastheadSidebar: React.FC = () => {
         <p className="opacity-75" style={{fontWeight: '600', fontSize: '14px', letterSpacing: '0.1rem'}}>{headline}</p>
       </div>
 
-      <div className={clsx('flex flex-col gap-2.5', css(`svg { color: ${iconColor} }`))}>
+      <div className={clsx('flex flex-col gap-2.5', css(`svg { color: #562AD5 }`))}>
         <DataDisplay icon={<Room />} className="!gap-2 text-xs">
           {formatLocation(location)}
         </DataDisplay>

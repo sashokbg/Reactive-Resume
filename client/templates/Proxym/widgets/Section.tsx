@@ -22,8 +22,6 @@ const Section: React.FC<SectionProps> = ({
   keywordsPath = 'keywords',
 }) => {
   const section: SectionType = useAppSelector((state) => get(state.resume.present, path, {}));
-  const dateFormat: string = useAppSelector((state) => get(state.resume.present, 'metadata.date.format'));
-  console.log(dateFormat);
   const primaryColor: string = useAppSelector((state) => get(state.resume.present, 'metadata.theme.primary'));
 
   const sectionId = useMemo(() => section.id || path.replace('sections.', ''), [path, section]);
@@ -52,7 +50,7 @@ const Section: React.FC<SectionProps> = ({
             levelNum: number = get(item, 'levelNum'),
             phone: string = get(item, 'phone'),
             email: string = get(item, 'email'),
-            date = formatDateString(get(item, 'date'), dateFormat);
+            date = formatDateString(get(item, 'date'), 'MMMM YYYY');
 
           return (
             <div key={id} id={id} className="grid gap-1">
